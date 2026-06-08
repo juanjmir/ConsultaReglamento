@@ -1,62 +1,53 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>Mi Asistente Virtual</title>
-    
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.71.1/build/stlite.css" />
-    <script src="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.71.1/build/stlite.js"></script>
-  </head>
-  <body>
-    <div id="root"></div>
-    
-    <script>
-      // Función para leer archivos externos de la misma carpeta
-      async function leerArchivo(url) {
-        const respuesta = await fetch(url);
-        if (!respuesta.ok) {
-          throw new Error(`No se pudo cargar el archivo: ${url}`);
-        }
-        return await respuesta.text();
-      }
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistente Virtual - Reglamento INACAP</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f4f6f9; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .chat-container { width: 100%; max-width: 650px; height: 85vh; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; overflow: hidden; }
+        .chat-header { background: #1e293b; color: white; padding: 20px; text-align: center; }
+        .chat-header h2 { font-size: 1.4rem; }
+        .chat-header p { font-size: 0.85rem; color: #94a3b8; margin-top: 4px; }
+        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        .message { max-width: 80%; padding: 12px 16px; border-radius: 8px; line-height: 1.5; font-size: 0.95rem; word-wrap: break-word; white-space: pre-line; }
+        .message.user { background: #0284c7; color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .message.bot { background: #f1f5f9; color: #1e293b; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .message.error { background: #fee2e2; color: #991b1b; align-self: center; text-align: center; max-width: 100%; }
+        
+        /* ESTILOS NUEVOS: Contenedor de carga y animación del círculo */
+        .loading-container { display: flex; align-items: center; gap: 10px; color: #64748b; font-size: 0.9rem; align-self: flex-start; padding-left: 5px; }
+        .spinner { width: 18px; height: 18px; border: 3px solid #cbd5e1; border-top: 3px solid #0284c7; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-      // Proceso principal de carga
-      async function iniciarChat() {
-        try {
-          // Buscamos y leemos los archivos externos en paralelo
-          const [codigoPython, textoFuente] = await Promise.all([
-            leerArchivo('./app.py'),
-            leerArchivo('./fuente.txt')
-          ]);
+        .chat-input-area { padding: 15px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; gap: 10px; }
+        .chat-input-area input { flex: 1; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; font-size: 0.95rem; }
+        .chat-input-area input:focus { border-color: #0284c7; }
+        .chat-input-area button { background: #0284c7; color: white; border: none; padding: 0 20px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: background 0.2s; }
+        .chat-input-area button:hover { background: #0369a1; }
+        .chat-input-area button:disabled { background: #94a3b8; cursor: not-allowed; }
+    </style>
+</head>
+<body>
 
-          // Montamos Stlite pasándole el contenido real de los archivos
-          stlite.mount(
-            {
-              requirements: ["google-genai"],
-              entrypoint: "app.py",
-              files: {
-                "app.py": codigoPython,
-                "fuente.txt": textoFuente
-              },
-            },
-            document.getElementById("root")
-          );
+<div class="chat-container">
+    <div class="chat-header">
+        <h2>🤖 Asistente Virtual Académico</h2>
+        <p>Consultas exclusivas sobre el Reglamento Institucional</p>
+    </div>
+    <div class="chat-messages" id="chat-messages">
+        <div class="message bot">¡Hola! Soy tu asistente virtual. Pregúntame lo que necesites sobre el reglamento institucional.</div>
+    </div>
+    <div class="chat-input-area">
+        <input type="text" id="user-input" placeholder="Escribe tu pregunta aquí..." autocomplete="off">
+        <button id="send-btn">Enviar</button>
+    </div>
+</div>
 
-        } catch (error) {
-          console.error("Error crítico al iniciar la aplicación:", error);
-          document.getElementById("root").innerHTML = `
-            <div style="color:red; text-align:center; margin-top:50px; font-family:sans-serif;">
-              <h3>Error al cargar el asistente</h3>
-              <p>${error.message}</p>
-              <p>Asegúrate de estar ejecutando el servidor local con Python.</p>
-            </div>`;
-        }
-      }
+<script src="./fuente.js"></script>
+<script src="./app.js"></script>
 
-      // Arrancar cuando la página web esté lista
-      window.addEventListener('DOMContentLoaded', iniciarChat);
-    </script>
-  </body>
+</body>
 </html>
